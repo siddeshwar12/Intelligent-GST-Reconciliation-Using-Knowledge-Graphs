@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST ITC Validation System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            z-index: 0;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--dark-light);
+            border-right: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 2rem 0;
+            z-index: 100;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            margin-bottom: 2rem;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .logo p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .nav-menu {
+            padding: 0 1rem;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 1.25rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            background: var(--dark-light);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .top-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--dark-light);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.2);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.blue { background: rgba(99, 102, 241, 0.1); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.1); }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.1); }
+        .stat-icon.red { background: rgba(239, 68, 68, 0.1); }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .stat-change {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-change.positive {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        /* Risk Odometer */
+        .risk-odometer-container {
+            background: var(--dark-light);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .odometer-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .odometer-title h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .odometer-title p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .odometer {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            margin: 0 auto 2rem;
+        }
+        
+        .odometer-arc {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .odometer-needle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            height: 120px;
+            background: linear-gradient(to top, var(--primary), transparent);
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-90deg);
+            transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+        
+        .odometer-needle::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+        }
+        
+        .odometer-scale {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .scale-mark {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            height: 15px;
+            background: var(--text-muted);
+            transform-origin: bottom center;
+        }
+        
+        .scale-label {
+            position: absolute;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transform: translate(-50%, -50%);
+        }
+        
+        .odometer-value {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .odometer-score {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        
+        .odometer-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .risk-zones {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .risk-zone {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .zone-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .zone-low { background: var(--success); }
+        .zone-medium { background: var(--warning); }
+        .zone-high { background: var(--danger); }
+        
+        /* Process Flow */
+        .process-flow {
+            background: var(--dark-light);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .flow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .flow-step {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .flow-step:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .flow-step:last-child::after {
+            display: none;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: 700;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .step-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Recent Activity */
+        .activity-list {
+            background: var(--dark-light);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .activity-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">🇮🇳</div>
+            <h1>GST ITC System</h1>
+            <p>Government Validation</p>
+        </div>
+        
+        <nav class="nav-menu">
+            <a href="/" class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="/workflow" class="nav-item">
+                <span class="nav-icon">🔄</span>
+                <span>Workflow</span>
+            </a>
+            <a href="/upload" class="nav-item">
+                <span class="nav-icon">📤</span>
+                <span>Upload Data</span>
+            </a>
+            <a href="/results" class="nav-item">
+                <span class="nav-icon">📈</span>
+                <span>Results</span>
+            </a>
+            <a href="/docs" class="nav-item">
+                <span class="nav-icon">📚</span>
+                <span>API Docs</span>
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar fade-in">
+            <div class="page-title">
+                <h2>GST ITC Validation Dashboard</h2>
+                <p>Real-time monitoring and intelligent reconciliation</p>
+            </div>
+            <div class="top-actions">
+                <button class="btn btn-secondary" onclick="window.location.href='/upload'">
+                    📤 Upload Data
+                </button>
+                <button class="btn btn-primary" onclick="window.location.href='/workflow'">
+                    🚀 Start Workflow
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card fade-in" style="animation-delay: 0.1s;">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="totalInvoices">0</div>
+                        <div class="stat-label">Total Invoices</div>
+                        <div class="stat-change positive">↑ Real-time</div>
+                    </div>
+                    <div class="stat-icon blue">📊</div>
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in" style="animation-delay: 0.2s;">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value">₹<span id="itcClaimed">0</span></div>
+                        <div class="stat-label">ITC Claimed</div>
+                        <div class="stat-change positive">↑ Cumulative</div>
+                    </div>
+                    <div class="stat-icon green">💰</div>
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in" style="animation-delay: 0.3s;">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value">₹<span id="itcApproved">0</span></div>
+                        <div class="stat-label">ITC Approved</div>
+                        <div class="stat-change positive">✓ Validated</div>
+                    </div>
+                    <div class="stat-icon green">✅</div>
+                </div>
+            </div>
+            
+            <div class="stat-card fade-in" style="animation-delay: 0.4s;">
+                <div class="stat-header">
+                    <div>
+                        <div class="stat-value" id="highRisk">0</div>
+                        <div class="stat-label">High Risk</div>
+                        <div class="stat-change negative">⚠️ Attention</div>
+                    </div>
+                    <div class="stat-icon red">🚨</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Risk Odometer -->
+        <div class="risk-odometer-container fade-in" style="animation-delay: 0.5s;">
+            <div class="odometer-title">
+                <h3>System Risk Score</h3>
+                <p>Real-time risk assessment based on AI analysis</p>
+            </div>
+            
+            <div class="odometer">
+                <svg class="odometer-arc" viewBox="0 0 300 200">
+                    <!-- Background Arc -->
+                    <path d="M 30 170 A 120 120 0 0 1 270 170" 
+                          fill="none" 
+                          stroke="rgba(99, 102, 241, 0.1)" 
+                          stroke-width="20" 
+                          stroke-linecap="round"/>
+                    
+                    <!-- Green Zone (0-33) -->
+                    <path d="M 30 170 A 120 120 0 0 1 110 70" 
+                          fill="none" 
+                          stroke="#10b981" 
+                          stroke-width="20" 
+                          stroke-linecap="round"/>
+                    
+                    <!-- Yellow Zone (33-66) -->
+                    <path d="M 110 70 A 120 120 0 0 1 190 70" 
+                          fill="none" 
+                          stroke="#f59e0b" 
+                          stroke-width="20" 
+                          stroke-linecap="round"/>
+                    
+                    <!-- Red Zone (66-100) -->
+                    <path d="M 190 70 A 120 120 0 0 1 270 170" 
+                          fill="none" 
+                          stroke="#ef4444" 
+                          stroke-width="20" 
+                          stroke-linecap="round"/>
+                </svg>
+                
+                <div class="odometer-needle" id="riskNeedle"></div>
+                
+                <div class="odometer-value">
+                    <div class="odometer-score" id="riskScore">0</div>
+                    <div class="odometer-label">Risk Score</div>
+                </div>
+            </div>
+            
+            <div class="risk-zones">
+                <div class="risk-zone">
+                    <div class="zone-indicator zone-low"></div>
+                    <span>Low (0-33)</span>
+                </div>
+                <div class="risk-zone">
+                    <div class="zone-indicator zone-medium"></div>
+                    <span>Medium (34-66)</span>
+                </div>
+                <div class="risk-zone">
+                    <div class="zone-indicator zone-high"></div>
+                    <span>High (67-100)</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Process Flow -->
+        <div class="process-flow fade-in" style="animation-delay: 0.6s;">
+            <div class="section-header">
+                <h3>ITC Validation Process</h3>
+                <p>Complete end-to-end workflow</p>
+            </div>
+            
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">GSTR-1 Filed</div>
+                    <div class="step-desc">Seller uploads data</div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">GSTR-2B Generated</div>
+                    <div class="step-desc">Government auto-creates</div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">GSTR-3B Claim</div>
+                    <div class="step-desc">Buyer claims ITC</div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">AI Validation</div>
+                    <div class="step-desc">System verifies chain</div>
+                </div>
+                
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Report Generated</div>
+                    <div class="step-desc">Final approval</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="activity-list fade-in" style="animation-delay: 0.7s;">
+            <div class="section-header">
+                <h3>Recent Activity</h3>
+                <p>Latest system events</p>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">✓</div>
+                <div class="activity-content">
+                    <div class="activity-title">50 Invoices Processed</div>
+                    <div class="activity-desc">Batch validation completed successfully</div>
+                </div>
+                <div class="activity-time">Just now</div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">⚠</div>
+                <div class="activity-content">
+                    <div class="activity-title">5 Mismatches Detected</div>
+                    <div class="activity-desc">Requires manual review</div>
+                </div>
+                <div class="activity-time">2 min ago</div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">📄</div>
+                <div class="activity-content">
+                    <div class="activity-title">PDF Report Generated</div>
+                    <div class="activity-desc">Comprehensive audit report ready</div>
+                </div>
+                <div class="activity-time">5 min ago</div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        // Counter Animation
+        function animateCounter(id, target, prefix = '', suffix = '') {
+            const element = document.getElementById(id);
+            const duration = 2000;
+            const steps = 60;
+            const increment = target / steps;
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = prefix + Math.floor(current).toLocaleString('en-IN') + suffix;
+            }, duration / steps);
+        }
+        
+        // Risk Odometer Animation
+        function setRiskScore(score) {
+            const needle = document.getElementById('riskNeedle');
+            const scoreDisplay = document.getElementById('riskScore');
+            
+            // Calculate rotation (-90deg to 90deg for 0-100 score)
+            const rotation = -90 + (score * 1.8);
+            needle.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            
+            // Animate score number
+            let current = 0;
+            const timer = setInterval(() => {
+                current += 1;
+                if (current >= score) {
+                    current = score;
+                    clearInterval(timer);
+                }
+                scoreDisplay.textContent = current;
+                
+                // Change color based on score
+                if (current < 34) {
+                    scoreDisplay.style.color = '#10b981';
+                } else if (current < 67) {
+                    scoreDisplay.style.color = '#f59e0b';
+                } else {
+                    scoreDisplay.style.color = '#ef4444';
+                }
+            }, 20);
+        }
+        
+        // Load stats from API
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                const total = data.total_invoices || 50;
+                const mismatches = data.total_mismatches || 5;
+                const highRisk = data.high_risk_count || 5;
+                
+                animateCounter('totalInvoices', total);
+                animateCounter('itcClaimed', total * 1800);
+                animateCounter('itcApproved', (total - mismatches) * 1800);
+                animateCounter('highRisk', highRisk);
+                
+                // Calculate risk score (0-100)
+                const riskScore = Math.min(100, Math.round((mismatches / total) * 100 * 2));
+                setTimeout(() => setRiskScore(riskScore), 500);
+                
+            } catch (error) {
+                // Use default values
+                animateCounter('totalInvoices', 50);
+                animateCounter('itcClaimed', 90000);
+                animateCounter('itcApproved', 81000);
+                animateCounter('highRisk', 5);
+                setTimeout(() => setRiskScore(20), 500);
+            }
+        }
+        
+        // Load on page load
+        window.addEventListener('load', loadStats);
+    </script>
+</body>
+</html>

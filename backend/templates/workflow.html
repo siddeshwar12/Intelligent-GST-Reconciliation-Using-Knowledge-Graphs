@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Workflow - Complete ITC Validation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #111827;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .workflow-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .workflow-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .workflow-title p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+        
+        /* Workflow Steps */
+        .workflow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .step-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.5s;
+        }
+        
+        .step-card.active::before {
+            transform: scaleX(1);
+        }
+        
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .step-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #111827;
+        }
+        
+        .step-card p {
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        
+        .step-status {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-processing { background: #dbeafe; color: #1e40af; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+        .status-error { background: #fee2e2; color: #991b1b; }
+        
+        /* Upload Section */
+        .upload-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.75rem;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .progress-container.active {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        
+        /* Results Section */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+        
+        .result-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .processing {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Hidden */
+        .hidden {
+            display: none;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>🔄 GST Workflow System</h1>
+            <div class="nav-links">
+                <a href="/">🏠 Dashboard</a>
+                <a href="/workflow">🔄 Workflow</a>
+                <a href="/results">📊 Results</a>
+                <a href="/docs">📚 API</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="workflow-title">
+            <h2>Complete GST ITC Validation Workflow</h2>
+            <p>GSTR-1 → GSTR-2B → GSTR-3B → Validation → PDF Report</p>
+        </div>
+
+        <!-- Workflow Steps -->
+        <div class="workflow-steps">
+            <div class="step-card" id="step1">
+                <div class="step-number">1</div>
+                <h3>📤 Upload GSTR-1</h3>
+                <p>Supplier uploads outward supplies data (GSTR-1) to the government portal</p>
+                <div class="step-status status-pending" id="status1">Pending</div>
+            </div>
+
+            <div class="step-card" id="step2">
+                <div class="step-number">2</div>
+                <h3>📥 Generate GSTR-2B</h3>
+                <p>System auto-generates GSTR-2B for buyer based on supplier's GSTR-1 data</p>
+                <div class="step-status status-pending" id="status2">Pending</div>
+            </div>
+
+            <div class="step-card" id="step3">
+                <div class="step-number">3</div>
+                <h3>💰 File GSTR-3B Claim</h3>
+                <p>Buyer files GSTR-3B with ITC claim based on GSTR-2B</p>
+                <div class="step-status status-pending" id="status3">Pending</div>
+            </div>
+
+            <div class="step-card" id="step4">
+                <div class="step-number">4</div>
+                <h3>🔍 Validate Chain</h3>
+                <p>Government validates complete invoice chain using knowledge graph</p>
+                <div class="step-status status-pending" id="status4">Pending</div>
+            </div>
+
+            <div class="step-card" id="step5">
+                <div class="step-number">5</div>
+                <h3>🎯 Detect Mismatches</h3>
+                <p>AI detects mismatches, fraud patterns, and risk classification</p>
+                <div class="step-status status-pending" id="status5">Pending</div>
+            </div>
+
+            <div class="step-card" id="step6">
+                <div class="step-number">6</div>
+                <h3>📄 Generate Report</h3>
+                <p>System generates comprehensive PDF audit report with findings</p>
+                <div class="step-status status-pending" id="status6">Pending</div>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h2 style="margin-bottom: 1.5rem; text-align: center;">Start GST Workflow</h2>
+            
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <h3>Upload GSTR-1 Data</h3>
+                <p style="margin: 1rem 0;">Drag & drop your CSV/JSON file or click to browse</p>
+                <input type="file" id="fileInput" accept=".csv,.json" style="display: none;">
+                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                    Choose File
+                </button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="startWorkflowBtn" onclick="startWorkflow()">
+                    🚀 Start Complete Workflow
+                </button>
+                <button class="btn btn-secondary" onclick="generateSampleData()">
+                    🎲 Use Sample Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-container" id="progressContainer">
+            <h3 style="margin-bottom: 1rem; text-align: center;">Processing Workflow...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Initializing...</div>
+            <div class="spinner" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <div style="background: white; border-radius: 1rem; padding: 2rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);">
+                <h2 style="margin-bottom: 1.5rem; text-align: center;">✅ Workflow Completed</h2>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3 style="color: #667eea;">📊 Total Invoices</h3>
+                        <div class="result-value" style="color: #667eea;" id="totalInvoices">0</div>
+                        <div class="result-label">Processed</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3 style="color: #10b981;">✅ Matched</h3>
+                        <div class="result-value" style="color: #10b981;" id="matchedCount">0</div>
+                        <div class="result-label">Valid Claims</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3 style="color: #f59e0b;">⚠️ Mismatches</h3>
+                        <div class="result-value" style="color: #f59e0b;" id="mismatchCount">0</div>
+                        <div class="result-label">Need Review</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3 style="color: #ef4444;">🚨 High Risk</h3>
+                        <div class="result-value" style="color: #ef4444;" id="highRiskCount">0</div>
+                        <div class="result-label">Critical Issues</div>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="downloadPDF()">
+                        📄 Download PDF Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewDetails()">
+                        🔍 View Detailed Results
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetWorkflow()">
+                        🔄 Start New Workflow
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedFile = null;
+        let workflowData = null;
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.csv') && !file.name.endsWith('.json')) {
+                alert('Please upload a CSV or JSON file');
+                return;
+            }
+            uploadedFile = file;
+            uploadArea.innerHTML = `
+                <div class="upload-icon">✅</div>
+                <h3>File Ready: ${file.name}</h3>
+                <p style="margin: 1rem 0;">Size: ${(file.size / 1024).toFixed(2)} KB</p>
+            `;
+        }
+
+        async function generateSampleData() {
+            document.getElementById('progressContainer').classList.add('active');
+            updateProgress(10, 'Generating sample GSTR-1 data...');
+            
+            try {
+                const response = await fetch('/api/generate-sample', { method: 'POST' });
+                const data = await response.json();
+                
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">✅</div>
+                    <h3>Sample Data Generated</h3>
+                    <p style="margin: 1rem 0;">${data.invoices_count} invoices ready</p>
+                `;
+                
+                updateProgress(100, 'Sample data ready!');
+                setTimeout(() => {
+                    document.getElementById('progressContainer').classList.remove('active');
+                }, 1000);
+            } catch (error) {
+                alert('Error generating sample data: ' + error.message);
+                document.getElementById('progressContainer').classList.remove('active');
+            }
+        }
+
+        async function startWorkflow() {
+            // Show progress
+            document.getElementById('progressContainer').classList.add('active');
+            document.getElementById('resultsSection').classList.add('hidden');
+            
+            // Step 1: Upload GSTR-1
+            await processStep(1, 'Uploading GSTR-1 data...', 15);
+            
+            // Step 2: Generate GSTR-2B
+            await processStep(2, 'Generating GSTR-2B for buyers...', 30);
+            
+            // Step 3: File GSTR-3B
+            await processStep(3, 'Processing GSTR-3B claims...', 45);
+            
+            // Step 4: Validate Chain
+            await processStep(4, 'Validating invoice chain with knowledge graph...', 60);
+            
+            // Step 5: Detect Mismatches
+            await processStep(5, 'Running AI mismatch detection & fraud analysis...', 80);
+            
+            // Step 6: Generate Report
+            await processStep(6, 'Generating comprehensive PDF report...', 95);
+            
+            // Fetch final results
+            await fetchResults();
+            
+            updateProgress(100, 'Workflow completed successfully!');
+            
+            setTimeout(() => {
+                document.getElementById('progressContainer').classList.remove('active');
+                document.getElementById('resultsSection').classList.remove('hidden');
+            }, 1000);
+        }
+
+        async function processStep(stepNum, message, progress) {
+            const stepCard = document.getElementById(`step${stepNum}`);
+            const statusEl = document.getElementById(`status${stepNum}`);
+            
+            // Mark as processing
+            stepCard.classList.add('active');
+            statusEl.className = 'step-status status-processing processing';
+            statusEl.textContent = 'Processing...';
+            updateProgress(progress, message);
+            
+            // Simulate processing time
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Mark as completed
+            statusEl.className = 'step-status status-completed';
+            statusEl.textContent = '✅ Completed';
+        }
+
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+
+        async function fetchResults() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                workflowData = data;
+                
+                document.getElementById('totalInvoices').textContent = data.total_invoices || 0;
+                document.getElementById('matchedCount').textContent = (data.total_invoices - data.total_mismatches) || 0;
+                document.getElementById('mismatchCount').textContent = data.total_mismatches || 0;
+                document.getElementById('highRiskCount').textContent = data.high_risk_count || 0;
+            } catch (error) {
+                console.error('Error fetching results:', error);
+            }
+        }
+
+        function downloadPDF() {
+            window.location.href = '/api/download-report';
+        }
+
+        function viewDetails() {
+            window.location.href = '/results';
+        }
+
+        function resetWorkflow() {
+            // Reset all steps
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+                const statusEl = document.getElementById(`status${i}`);
+                statusEl.className = 'step-status status-pending';
+                statusEl.textContent = 'Pending';
+            }
+            
+            // Reset UI
+            document.getElementById('resultsSection').classList.add('hidden');
+            uploadArea.innerHTML = `
+                <div class="upload-icon">📁</div>
+                <h3>Upload GSTR-1 Data</h3>
+                <p style="margin: 1rem 0;">Drag & drop your CSV/JSON file or click to browse</p>
+                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
+                    Choose File
+                </button>
+            `;
+            uploadedFile = null;
+        }
+    </script>
+</body>
+</html>

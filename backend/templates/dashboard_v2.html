@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Reconciliation Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-main: #050505;
+            --bg-card: #0d0d0d;
+            --bg-elevated: #1a1a1a;
+            --accent-green: #00ff9f;
+            --accent-blue: #00b8ff;
+            --accent-orange: #ff6b00;
+            --accent-red: #ff0055;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border: #222222;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Mesh Gradient Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(at 0% 0%, rgba(0, 255, 159, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 184, 255, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 107, 0, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(255, 0, 85, 0.05) 0px, transparent 50%);
+            z-index: 0;
+        }
+        
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 20s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-100px) translateX(50px); }
+            50% { transform: translateY(-200px) translateX(-50px); }
+            75% { transform: translateY(-100px) translateX(100px); }
+        }
+        
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .brand-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 40px rgba(0, 255, 159, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 0.25rem;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn {
+            padding: 0.875rem 1.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-green);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            box-shadow: 0 8px 24px rgba(0, 255, 159, 0.2);
+        }
+        
+        .nav-btn.primary:hover {
+            box-shadow: 0 12px 32px rgba(0, 255, 159, 0.3);
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .hero h2 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Metrics Grid */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s;
+        }
+        
+        .metric-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-green);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .metric-value {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .metric-change.up { color: var(--accent-green); }
+        .metric-change.down { color: var(--accent-red); }
+        
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .panel-action {
+            font-size: 0.875rem;
+            color: var(--accent-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .panel-action:hover {
+            color: var(--accent-blue);
+        }
+        
+        /* Risk Meter */
+        .risk-meter {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .meter-circle {
+            position: relative;
+            width: 240px;
+            height: 240px;
+        }
+        
+        .meter-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 180deg,
+                var(--accent-green) 0deg 120deg,
+                var(--accent-orange) 120deg 240deg,
+                var(--accent-red) 240deg 360deg
+            );
+            opacity: 0.2;
+        }
+        
+        .meter-fill {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 180deg,
+                var(--accent-green) 0deg,
+                transparent 0deg
+            );
+            transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .meter-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 180px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border);
+        }
+        
+        .meter-score {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+        
+        .meter-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0.5rem;
+        }
+        
+        .risk-legend {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+        }
+        
+        .timeline-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 23px;
+            top: 50px;
+            width: 2px;
+            height: calc(100% - 30px);
+            background: var(--border);
+        }
+        
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        
+        .timeline-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            border: 2px solid var(--border);
+            background: var(--bg-elevated);
+        }
+        
+        .timeline-icon.active {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            box-shadow: 0 0 30px rgba(0, 255, 159, 0.3);
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .timeline-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        
+        /* Full Width Panel */
+        .full-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        /* Process Steps */
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .process-step {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .process-step::after {
+            content: '→';
+            position: absolute;
+            right: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+        
+        .process-step:last-child::after {
+            display: none;
+        }
+        
+        .process-step:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-green);
+            transform: scale(1.05);
+        }
+        
+        .step-num {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: 800;
+            font-size: 0.875rem;
+        }
+        
+        .step-name {
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2rem;
+            }
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+            .process-steps {
+                grid-template-columns: 1fr;
+            }
+            .process-step::after {
+                display: none;
+            }
+        }
+        
+        /* Animations */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            animation: slideUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">🇮🇳</div>
+                <div class="brand-text">
+                    <h1>GST Intelligence</h1>
+                    <p>Reconciliation Engine</p>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="/workflow" class="nav-btn">Workflow</a>
+                <a href="/upload" class="nav-btn">Upload</a>
+                <a href="/results" class="nav-btn">Results</a>
+                <a href="/workflow" class="nav-btn primary">Start Process →</a>
+            </nav>
+        </header>
+        
+        <!-- Hero -->
+        <section class="hero animate">
+            <h2>Intelligent Tax Validation</h2>
+            <p>AI-powered GST reconciliation with real-time fraud detection and compliance monitoring</p>
+        </section>
+        
+        <!-- Metrics -->
+        <div class="metrics">
+            <div class="metric-card animate" style="animation-delay: 0.1s;">
+                <div class="metric-label">Total Invoices</div>
+                <div class="metric-value" id="totalInvoices">0</div>
+                <div class="metric-change up">↑ <span id="invoiceChange">0</span> today</div>
+            </div>
+            
+            <div class="metric-card animate" style="animation-delay: 0.2s;">
+                <div class="metric-label">ITC Claimed</div>
+                <div class="metric-value">₹<span id="itcClaimed">0</span></div>
+                <div class="metric-change up">↑ Active</div>
+            </div>
+            
+            <div class="metric-card animate" style="animation-delay: 0.3s;">
+                <div class="metric-label">Validated</div>
+                <div class="metric-value" id="validated">0</div>
+                <div class="metric-change up">↑ <span id="validatedPercent">0</span>%</div>
+            </div>
+            
+            <div class="metric-card animate" style="animation-delay: 0.4s;">
+                <div class="metric-label">High Risk</div>
+                <div class="metric-value" id="highRisk">0</div>
+                <div class="metric-change down">⚠ Flagged</div>
+            </div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Risk Meter -->
+            <div class="panel animate" style="animation-delay: 0.5s;">
+                <div class="panel-header">
+                    <h3 class="panel-title">Risk Assessment</h3>
+                    <a href="/results" class="panel-action">View Details →</a>
+                </div>
+                
+                <div class="risk-meter">
+                    <div class="meter-circle">
+                        <div class="meter-bg"></div>
+                        <div class="meter-fill" id="meterFill"></div>
+                        <div class="meter-inner">
+                            <div class="meter-score" id="riskScore">0</div>
+                            <div class="meter-label">Risk Score</div>
+                        </div>
+                    </div>
+                    
+                    <div class="risk-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: var(--accent-green);"></div>
+                            <span>Low (0-33)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: var(--accent-orange);"></div>
+                            <span>Medium (34-66)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: var(--accent-red);"></div>
+                            <span>High (67-100)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Timeline -->
+            <div class="panel animate" style="animation-delay: 0.6s;">
+                <div class="panel-header">
+                    <h3 class="panel-title">Recent Activity</h3>
+                    <a href="/results" class="panel-action">View All →</a>
+                </div>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon active">✓</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Batch Processing Complete</div>
+                            <div class="timeline-desc">Successfully processed 50 invoices with full validation chain</div>
+                            <div class="timeline-time">2 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon">⚠</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Mismatches Detected</div>
+                            <div class="timeline-desc">5 invoices flagged for manual review - amount discrepancies found</div>
+                            <div class="timeline-time">5 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon">📄</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Report Generated</div>
+                            <div class="timeline-desc">Comprehensive audit report with natural language explanations</div>
+                            <div class="timeline-time">10 minutes ago</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon">🔍</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Fraud Pattern Analysis</div>
+                            <div class="timeline-desc">ML model detected suspicious circular trading network</div>
+                            <div class="timeline-time">15 minutes ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Process Flow -->
+        <div class="full-panel animate" style="animation-delay: 0.7s;">
+            <div class="panel-header">
+                <h3 class="panel-title">ITC Validation Process</h3>
+                <a href="/workflow" class="panel-action">Start Workflow →</a>
+            </div>
+            
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-num">1</div>
+                    <div class="step-name">GSTR-1</div>
+                    <div class="step-info">Seller Filing</div>
+                </div>
+                
+                <div class="process-step">
+                    <div class="step-num">2</div>
+                    <div class="step-name">GSTR-2B</div>
+                    <div class="step-info">Auto-Generated</div>
+                </div>
+                
+                <div class="process-step">
+                    <div class="step-num">3</div>
+                    <div class="step-name">GSTR-3B</div>
+                    <div class="step-info">Buyer Claim</div>
+                </div>
+                
+                <div class="process-step">
+                    <div class="step-num">4</div>
+                    <div class="step-name">Validate</div>
+                    <div class="step-info">AI Analysis</div>
+                </div>
+                
+                <div class="process-step">
+                    <div class="step-num">5</div>
+                    <div class="step-name">Report</div>
+                    <div class="step-info">Final Approval</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // Counter animation
+        function animateCounter(id, target, prefix = '', suffix = '') {
+            const element = document.getElementById(id);
+            const duration = 2000;
+            const steps = 60;
+            const increment = target / steps;
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = prefix + Math.floor(current).toLocaleString('en-IN') + suffix;
+            }, duration / steps);
+        }
+        
+        // Risk meter animation
+        function setRiskMeter(score) {
+            const fill = document.getElementById('meterFill');
+            const scoreDisplay = document.getElementById('riskScore');
+            
+            // Calculate rotation (0-360 degrees)
+            const rotation = (score / 100) * 360;
+            
+            // Determine color
+            let color;
+            if (score < 34) {
+                color = 'var(--accent-green)';
+            } else if (score < 67) {
+                color = 'var(--accent-orange)';
+            } else {
+                color = 'var(--accent-red)';
+            }
+            
+            fill.style.background = `conic-gradient(from 180deg, ${color} ${rotation}deg, transparent ${rotation}deg)`;
+            
+            // Animate score
+            let current = 0;
+            const timer = setInterval(() => {
+                current += 1;
+                if (current >= score) {
+                    current = score;
+                    clearInterval(timer);
+                }
+                scoreDisplay.textContent = current;
+                scoreDisplay.style.color = color;
+            }, 20);
+        }
+        
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                const total = data.total_invoices || 50;
+                const mismatches = data.total_mismatches || 5;
+                const highRisk = data.high_risk_count || 5;
+                const validated = total - mismatches;
+                
+                animateCounter('totalInvoices', total);
+                animateCounter('invoiceChange', Math.floor(total * 0.2));
+                animateCounter('itcClaimed', total * 1800);
+                animateCounter('validated', validated);
+                animateCounter('validatedPercent', Math.floor((validated / total) * 100));
+                animateCounter('highRisk', highRisk);
+                
+                const riskScore = Math.min(100, Math.round((mismatches / total) * 100 * 2));
+                setTimeout(() => setRiskMeter(riskScore), 500);
+                
+            } catch (error) {
+                animateCounter('totalInvoices', 50);
+                animateCounter('invoiceChange', 10);
+                animateCounter('itcClaimed', 90000);
+                animateCounter('validated', 45);
+                animateCounter('validatedPercent', 90);
+                animateCounter('highRisk', 5);
+                setTimeout(() => setRiskMeter(20), 500);
+            }
+        }
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            createParticles();
+            loadStats();
+        });
+    </script>
+</body>
+</html>

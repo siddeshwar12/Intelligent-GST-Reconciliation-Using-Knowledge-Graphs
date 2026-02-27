@@ -1,0 +1,14 @@
+-r requirements.txt
+
+# Development Tools
+ipython==8.20.0
+ipdb==0.13.13
+
+# Documentation
+mkdocs==1.5.3
+mkdocs-material==9.5.3
+
+# Code Quality
+pylint==3.0.3
+isort==5.13.2
+autopep8==2.0.4

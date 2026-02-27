@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - GST Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-main: #050505;
+            --bg-card: #0d0d0d;
+            --bg-elevated: #1a1a1a;
+            --accent-green: #00ff9f;
+            --accent-blue: #00b8ff;
+            --accent-orange: #ff6b00;
+            --accent-red: #ff0055;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border: #222222;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(at 0% 0%, rgba(0, 255, 159, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 184, 255, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 107, 0, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(255, 0, 85, 0.05) 0px, transparent 50%);
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .brand-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 40px rgba(0, 255, 159, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 0.25rem;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn {
+            padding: 0.875rem 1.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-green);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            box-shadow: 0 8px 24px rgba(0, 255, 159, 0.2);
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-title h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .page-title p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+        
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(0, 255, 159, 0.2);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 12px 32px rgba(0, 255, 159, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-green);
+        }
+        
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+        
+        .summary-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .results-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .tab {
+            padding: 0.5rem 1rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover, .tab.active {
+            background: rgba(0, 255, 159, 0.1);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        
+        .mismatch-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .mismatch-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .mismatch-card:hover {
+            border-color: var(--accent-green);
+            transform: translateX(4px);
+        }
+        
+        .mismatch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .mismatch-info h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .mismatch-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .risk-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .risk-high {
+            background: rgba(255, 0, 85, 0.1);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+        
+        .risk-medium {
+            background: rgba(255, 107, 0, 0.1);
+            color: var(--accent-orange);
+            border: 1px solid var(--accent-orange);
+        }
+        
+        .risk-low {
+            background: rgba(0, 255, 159, 0.1);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+        
+        .mismatch-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .detail-item {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .detail-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .mismatch-explanation {
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent-orange);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .mismatch-explanation h5 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .mismatch-explanation p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 1200px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .mismatch-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            animation: slideUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">🇮🇳</div>
+                <div class="brand-text">
+                    <h1>GST Intelligence</h1>
+                    <p>Reconciliation Engine</p>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="/" class="nav-btn">Dashboard</a>
+                <a href="/workflow" class="nav-btn">Workflow</a>
+                <a href="/upload" class="nav-btn">Upload</a>
+                <a href="/results" class="nav-btn active">Results</a>
+            </nav>
+        </header>
+        
+        <div class="page-header animate">
+            <div class="page-title">
+                <h2>Validation Results</h2>
+                <p>Detailed analysis and mismatch reports</p>
+            </div>
+            <a href="#" class="btn btn-primary" onclick="downloadReport()">📄 Download PDF Report</a>
+        </div>
+        
+        <div class="summary-grid">
+            <div class="summary-card animate" style="animation-delay: 0.1s;">
+                <div class="summary-label">Total Processed</div>
+                <div class="summary-value">50</div>
+                <div class="summary-desc">Invoices validated</div>
+            </div>
+            
+            <div class="summary-card animate" style="animation-delay: 0.2s;">
+                <div class="summary-label">Approved</div>
+                <div class="summary-value" style="color: var(--accent-green);">45</div>
+                <div class="summary-desc">90% success rate</div>
+            </div>
+            
+            <div class="summary-card animate" style="animation-delay: 0.3s;">
+                <div class="summary-label">Mismatches</div>
+                <div class="summary-value" style="color: var(--accent-orange);">5</div>
+                <div class="summary-desc">Requires review</div>
+            </div>
+            
+            <div class="summary-card animate" style="animation-delay: 0.4s;">
+                <div class="summary-label">High Risk</div>
+                <div class="summary-value" style="color: var(--accent-red);">3</div>
+                <div class="summary-desc">Critical issues</div>
+            </div>
+        </div>
+        
+        <div class="results-panel animate" style="animation-delay: 0.5s;">
+            <div class="panel-header">
+                <h3 class="panel-title">Detected Mismatches</h3>
+                <div class="filter-tabs">
+                    <div class="tab active" onclick="filterResults('all')">All</div>
+                    <div class="tab" onclick="filterResults('high')">High Risk</div>
+                    <div class="tab" onclick="filterResults('medium')">Medium</div>
+                    <div class="tab" onclick="filterResults('low')">Low</div>
+                </div>
+            </div>
+            
+            <div class="mismatch-list" id="mismatchList">
+                <!-- Mismatch 1 -->
+                <div class="mismatch-card" data-risk="high">
+                    <div class="mismatch-header">
+                        <div class="mismatch-info">
+                            <h4>Invoice INV-2024-001</h4>
+                            <div class="mismatch-meta">TechCorp Solutions → Global Enterprises Ltd</div>
+                        </div>
+                        <div class="risk-badge risk-high">High Risk</div>
+                    </div>
+                    
+                    <div class="mismatch-details">
+                        <div class="detail-item">
+                            <div class="detail-label">GSTR-1 Amount</div>
+                            <div class="detail-value">₹1,800</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">GSTR-2B Amount</div>
+                            <div class="detail-value">₹1,584</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Difference</div>
+                            <div class="detail-value" style="color: var(--accent-red);">₹216</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mismatch-explanation">
+                        <h5>🔍 What Happened</h5>
+                        <p>TechCorp Solutions filed GSTR-1 showing ₹1,800 tax on invoice INV-2024-001 to Global Enterprises Ltd. However, GSTR-2B shows only ₹1,584 eligible for ITC - a 12% mismatch of ₹216.</p>
+                    </div>
+                    
+                    <div class="mismatch-explanation" style="border-left-color: var(--accent-red);">
+                        <h5>⚠️ Why This Is Risky</h5>
+                        <p>• Amount discrepancy exceeds 10% threshold<br>• Vendor filing delay of 38 days detected<br>• Pattern matches known fraud indicators</p>
+                    </div>
+                    
+                    <div class="mismatch-explanation" style="border-left-color: var(--accent-blue);">
+                        <h5>✅ Recommendation</h5>
+                        <p>Reject ITC claim pending vendor clarification. Request supporting documents and payment proof. Flag vendor for enhanced monitoring.</p>
+                    </div>
+                </div>
+                
+                <!-- Mismatch 2 -->
+                <div class="mismatch-card" data-risk="medium">
+                    <div class="mismatch-header">
+                        <div class="mismatch-info">
+                            <h4>Invoice INV-2024-002</h4>
+                            <div class="mismatch-meta">Manufacturing Co → Retail Chain Pvt Ltd</div>
+                        </div>
+                        <div class="risk-badge risk-medium">Medium Risk</div>
+                    </div>
+                    
+                    <div class="mismatch-details">
+                        <div class="detail-item">
+                            <div class="detail-label">GSTR-1 Amount</div>
+                            <div class="detail-value">₹2,500</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">GSTR-2B Amount</div>
+                            <div class="detail-value">₹2,375</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Difference</div>
+                            <div class="detail-value" style="color: var(--accent-orange);">₹125</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mismatch-explanation">
+                        <h5>🔍 What Happened</h5>
+                        <p>Manufacturing Co filed GSTR-1 with ₹2,500 tax, but GSTR-2B shows ₹2,375 - a 5% difference of ₹125. This is within acceptable variance but requires verification.</p>
+                    </div>
+                    
+                    <div class="mismatch-explanation" style="border-left-color: var(--accent-orange);">
+                        <h5>⚠️ Why This Is Risky</h5>
+                        <p>• Minor calculation error detected<br>• Vendor has 2 previous mismatches<br>• Payment verification pending</p>
+                    </div>
+                    
+                    <div class="mismatch-explanation" style="border-left-color: var(--accent-blue);">
+                        <h5>✅ Recommendation</h5>
+                        <p>Approve ITC with conditional monitoring. Request vendor to correct filing in next return. Schedule follow-up audit.</p>
+                    </div>
+                </div>
+                
+                <!-- Mismatch 3 -->
+                <div class="mismatch-card" data-risk="low">
+                    <div class="mismatch-header">
+                        <div class="mismatch-info">
+                            <h4>Invoice INV-2024-003</h4>
+                            <div class="mismatch-meta">Services Inc → Tech Startup Ltd</div>
+                        </div>
+                        <div class="risk-badge risk-low">Low Risk</div>
+                    </div>
+                    
+                    <div class="mismatch-details">
+                        <div class="detail-item">
+                            <div class="detail-label">GSTR-1 Amount</div>
+                            <div class="detail-value">₹1,800</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">GSTR-2B Amount</div>
+                            <div class="detail-value">₹1,782</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Difference</div>
+                            <div class="detail-value" style="color: var(--accent-green);">₹18</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mismatch-explanation">
+                        <h5>🔍 What Happened</h5>
+                        <p>Services Inc filed GSTR-1 with ₹1,800 tax, GSTR-2B shows ₹1,782 - only 1% difference of ₹18. This is likely a rounding error.</p>
+                    </div>
+                    
+                    <div class="mismatch-explanation" style="border-left-color: var(--accent-green);">
+                        <h5>⚠️ Why This Is Risky</h5>
+                        <p>• Minimal risk - likely rounding difference<br>• Vendor has clean compliance history<br>• Payment verified and confirmed</p>
+                    </div>
+                    
+                    <div class="mismatch-explanation" style="border-left-color: var(--accent-blue);">
+                        <h5>✅ Recommendation</h5>
+                        <p>Approve ITC claim. No action required. Difference is within acceptable tolerance limits.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function filterResults(type) {
+            const cards = document.querySelectorAll('.mismatch-card');
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            cards.forEach(card => {
+                if (type === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    const risk = card.getAttribute('data-risk');
+                    card.style.display = risk === type ? 'block' : 'none';
+                }
+            });
+        }
+        
+        function downloadReport() {
+            alert('PDF report generation initiated. This will redirect to the report download page.');
+            // In production, this would trigger actual PDF generation
+        }
+    </script>
+</body>
+</html>

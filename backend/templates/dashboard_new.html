@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Intelligent Reconciliation System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            z-index: 0;
+            animation: bgShift 20s ease-in-out infinite;
+        }
+        
+        @keyframes bgShift {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Header */
+        .header {
+            position: relative;
+            z-index: 10;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
+        
+        .logo-text p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        
+        .nav-links a.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        /* Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+        
+        .hero-description {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .stat-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+            animation: fadeInUp 0.6s;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+            transform: scaleX(0);
+            transition: transform 0.5s;
+        }
+        
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .stat-change {
+            font-size: 0.875rem;
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .stat-change.negative {
+            color: #ef4444;
+        }
+        
+        /* Process Flow Timeline */
+        .process-flow {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1.05rem;
+            margin-bottom: 3rem;
+        }
+        
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 2rem 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+        
+        .timeline-step {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            flex: 1;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .timeline-step:hover {
+            transform: scale(1.05);
+        }
+        
+        .step-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
+            position: relative;
+        }
+        
+        .step-circle::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid #3b82f6;
+            animation: pulse-ring 2s infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+        
+        .step-title {
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+        
+        .step-desc {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            max-width: 180px;
+            margin: 0 auto;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            animation: slideInUp 0.4s;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .modal h3 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+        }
+        
+        .modal p {
+            color: #cbd5e1;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+        
+        .cta-section p {
+            font-size: 1.125rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+        
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            padding: 1rem 3rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.125rem;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+            .timeline { flex-direction: column; gap: 2rem; }
+            .timeline::before { display: none; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">🇮🇳</div>
+                <div class="logo-text">
+                    <h1>GST ITC System</h1>
+                    <p>Government Validation Engine</p>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="/" class="active">Dashboard</a>
+                <a href="/workflow">Workflow</a>
+                <a href="/upload">Upload</a>
+                <a href="/results">Results</a>
+                <a href="/docs">API</a>
+            </nav>
+        </div>
+    </header>
+
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-badge">🔒 Government Authorized System</div>
+            <h1>GST Intelligent Reconciliation System<br>Government ITC Validation Engine</h1>
+            <p class="hero-subtitle">
+                This system validates whether Input Tax Credit (ITC) claimed by a buyer is legally supported by seller filings and tax payment.
+            </p>
+            <div class="hero-description">
+                <strong>How It Works:</strong> When a seller files GSTR-1, the government auto-generates GSTR-2B for the buyer. 
+                Our system validates the complete chain to ensure ITC claims are legitimate, preventing fraud and ensuring compliance.
+            </div>
+        </div>
+
+        <!-- Stats Grid with Counter Animation -->
+        <div class="stats-grid">
+            <div class="stat-card" style="animation-delay: 0.1s;">
+                <div class="stat-icon">📊</div>
+                <div class="stat-label">Total Invoices Processed</div>
+                <div class="stat-value" id="totalInvoices">0</div>
+                <div class="stat-change">↑ Updated in real-time</div>
+            </div>
+            
+            <div class="stat-card" style="animation-delay: 0.2s;">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Total ITC Claimed</div>
+                <div class="stat-value">₹<span id="itcClaimed">0</span></div>
+                <div class="stat-change">↑ Cumulative amount</div>
+            </div>
+            
+            <div class="stat-card" style="animation-delay: 0.3s;">
+                <div class="stat-icon">✅</div>
+                <div class="stat-label">Total ITC Approved</div>
+                <div class="stat-value">₹<span id="itcApproved">0</span></div>
+                <div class="stat-change">↑ Validated claims</div>
+            </div>
+            
+            <div class="stat-card" style="animation-delay: 0.4s;">
+                <div class="stat-icon">🚨</div>
+                <div class="stat-label">High Risk Invoices</div>
+                <div class="stat-value" id="highRisk">0</div>
+                <div class="stat-change negative">⚠️ Requires attention</div>
+            </div>
+        </div>
+
+        <!-- Process Flow Timeline -->
+        <div class="process-flow">
+            <h2 class="section-title">Complete ITC Validation Process</h2>
+            <p class="section-subtitle">Click on any step to understand how it works</p>
+            
+            <div class="timeline">
+                <div class="timeline-step" onclick="showModal('step1')">
+                    <div class="step-circle">📤</div>
+                    <div class="step-title">Step 1</div>
+                    <div class="step-desc">Seller Files GSTR-1</div>
+                </div>
+                
+                <div class="timeline-step" onclick="showModal('step2')">
+                    <div class="step-circle">🏛️</div>
+                    <div class="step-title">Step 2</div>
+                    <div class="step-desc">Government Generates GSTR-2B</div>
+                </div>
+                
+                <div class="timeline-step" onclick="showModal('step3')">
+                    <div class="step-circle">💼</div>
+                    <div class="step-title">Step 3</div>
+                    <div class="step-desc">Buyer Claims ITC in GSTR-3B</div>
+                </div>
+                
+                <div class="timeline-step" onclick="showModal('step4')">
+                    <div class="step-circle">🔍</div>
+                    <div class="step-title">Step 4</div>
+                    <div class="step-desc">System Verifies Full Chain</div>
+                </div>
+                
+                <div class="timeline-step" onclick="showModal('step5')">
+                    <div class="step-circle">📄</div>
+                    <div class="step-title">Step 5</div>
+                    <div class="step-desc">Final Government Approval</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2>Ready to Validate Your ITC Claims?</h2>
+            <p>Start the complete workflow to process invoices and generate compliance reports</p>
+            <a href="/workflow" class="btn-primary">🚀 Start Validation Workflow</a>
+        </div>
+    </div>
+
+    <!-- Modals for Each Step -->
+    <div class="modal" id="modal-step1">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('step1')">×</div>
+            <h3>📤 Step 1: Seller Files GSTR-1</h3>
+            <p>
+                <strong>What Happens:</strong><br>
+                The seller (supplier) files their GSTR-1 return with the government, declaring all outward supplies (sales) made during the month.
+                <br><br>
+                <strong>Information Included:</strong><br>
+                • Invoice numbers and dates<br>
+                • Buyer GSTIN<br>
+                • Invoice amounts<br>
+                • GST charged (CGST, SGST, IGST)<br>
+                <br>
+                <strong>Why It Matters:</strong><br>
+                This is the source of truth. If a seller doesn't file GSTR-1 or files incorrect information, the buyer cannot claim ITC.
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-step2">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('step2')">×</div>
+            <h3>🏛️ Step 2: Government Generates GSTR-2B</h3>
+            <p>
+                <strong>What Happens:</strong><br>
+                The government automatically generates GSTR-2B for each buyer based on the GSTR-1 filed by all their suppliers.
+                <br><br>
+                <strong>Key Point:</strong><br>
+                The buyer CANNOT modify GSTR-2B. It is a read-only document generated by the government system.
+                <br><br>
+                <strong>What It Contains:</strong><br>
+                • All invoices where the buyer's GSTIN appears<br>
+                • ITC eligible amounts<br>
+                • Supplier details<br>
+                <br>
+                <strong>Why It Matters:</strong><br>
+                GSTR-2B is the government's official record of what ITC the buyer is eligible to claim. Any claim beyond this is invalid.
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-step3">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('step3')">×</div>
+            <h3>💼 Step 3: Buyer Claims ITC in GSTR-3B</h3>
+            <p>
+                <strong>What Happens:</strong><br>
+                The buyer files their GSTR-3B return and claims Input Tax Credit based on their GSTR-2B.
+                <br><br>
+                <strong>The Problem:</strong><br>
+                Some buyers claim MORE ITC than what appears in their GSTR-2B, either by mistake or intentionally.
+                <br><br>
+                <strong>Example:</strong><br>
+                • GSTR-2B shows: ₹1,800 ITC eligible<br>
+                • Buyer claims in GSTR-3B: ₹2,200<br>
+                • Difference: ₹400 (INVALID CLAIM)<br>
+                <br>
+                <strong>Why It Matters:</strong><br>
+                Invalid ITC claims lead to penalties, interest, and potential fraud charges. Our system catches these mismatches.
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-step4">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('step4')">×</div>
+            <h3>🔍 Step 4: System Verifies Full Chain</h3>
+            <p>
+                <strong>What Our System Does:</strong><br>
+                We validate the COMPLETE chain using Knowledge Graph technology:
+                <br><br>
+                <strong>Validation Steps:</strong><br>
+                1. Check if invoice exists in seller's GSTR-1<br>
+                2. Verify invoice appears in buyer's GSTR-2B<br>
+                3. Compare amounts (invoice vs GSTR-1 vs GSTR-2B)<br>
+                4. Verify GST calculations are correct<br>
+                5. Check if seller's GSTIN is valid and active<br>
+                6. Detect fraud patterns (circular trading, fake invoices)<br>
+                7. Assess vendor compliance risk using ML<br>
+                <br>
+                <strong>Why It's Different:</strong><br>
+                Traditional systems only match invoice numbers. We validate the ENTIRE relationship network using graph database technology.
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-step5">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('step5')">×</div>
+            <h3>📄 Step 5: Final Government Approval Report</h3>
+            <p>
+                <strong>What You Get:</strong><br>
+                A comprehensive report in natural language explaining:
+                <br><br>
+                <strong>For Each Invoice:</strong><br>
+                • ✅ Approved: ITC claim is valid<br>
+                • ❌ Rejected: ITC claim is invalid (with reasons)<br>
+                • ⚠️ High Risk: Requires manual review<br>
+                <br>
+                <strong>Report Includes:</strong><br>
+                • Company names (Supplier & Buyer)<br>
+                • What went wrong (in plain English)<br>
+                • Why it's risky<br>
+                • What action to take<br>
+                • Fraud indicators (if any)<br>
+                <br>
+                <strong>Download Options:</strong><br>
+                • PDF Report (for auditors)<br>
+                • Excel Export (for analysis)<br>
+                • API Access (for integration)<br>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Counter Animation
+        function animateCounter(id, target, prefix = '', suffix = '') {
+            const element = document.getElementById(id);
+            const duration = 2000;
+            const steps = 60;
+            const increment = target / steps;
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = prefix + Math.floor(current).toLocaleString('en-IN') + suffix;
+            }, duration / steps);
+        }
+        
+        // Load stats from API
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                animateCounter('totalInvoices', data.total_invoices || 50);
+                animateCounter('itcClaimed', (data.total_invoices || 50) * 1800, '', '');
+                animateCounter('itcApproved', ((data.total_invoices || 50) - (data.total_mismatches || 5)) * 1800, '', '');
+                animateCounter('highRisk', data.high_risk_count || 5);
+            } catch (error) {
+                // Use default values if API fails
+                animateCounter('totalInvoices', 50);
+                animateCounter('itcClaimed', 90000, '', '');
+                animateCounter('itcApproved', 81000, '', '');
+                animateCounter('highRisk', 5);
+            }
+        }
+        
+        // Modal functions
+        function showModal(step) {
+            document.getElementById('modal-' + step).classList.add('active');
+        }
+        
+        function closeModal(step) {
+            document.getElementById('modal-' + step).classList.remove('active');
+        }
+        
+        // Close modal on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+        
+        // Load stats on page load
+        window.addEventListener('load', loadStats);
+    </script>
+</body>
+</html>

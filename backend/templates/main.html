@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST ITC Validation Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151932;
+            --bg-card: #1a1f3a;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #b24bf3;
+            --accent-pink: #ff006e;
+            --text-primary: #ffffff;
+            --text-secondary: #8b92b0;
+            --success: #00ff88;
+            --warning: #ffb800;
+            --danger: #ff3366;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(178, 75, 243, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 110, 0.05) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+        }
+        
+        /* Top Navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(26, 31, 58, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 3rem;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-text p {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 2px;
+            background: var(--accent-cyan);
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 212, 255, 0.5);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 100px 3rem 3rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Hero Stats */
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+        
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.2);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .stat-trend {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        /* Risk Gauge Section */
+        .risk-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .risk-gauge-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gauge-title {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+        }
+        
+        .gauge-container {
+            position: relative;
+            width: 250px;
+            height: 150px;
+        }
+        
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .gauge-needle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 3px;
+            height: 100px;
+            background: linear-gradient(to top, var(--accent-cyan), transparent);
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-90deg);
+            transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+        
+        .gauge-needle::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--accent-cyan);
+        }
+        
+        .gauge-value {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        
+        .gauge-score {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .gauge-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .risk-legend {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        /* Process Timeline */
+        .timeline-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        
+        .timeline-header {
+            margin-bottom: 2rem;
+        }
+        
+        .timeline-header h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-header p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .timeline-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .timeline-steps::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            z-index: 0;
+        }
+        
+        .timeline-step {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.2rem;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .step-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+        }
+        
+        .step-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .step-desc {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Activity Grid */
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .activity-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .activity-header h3 {
+            font-size: 1.1rem;
+        }
+        
+        .view-all {
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .view-all:hover {
+            color: var(--accent-purple);
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .activity-item:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .activity-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .risk-section {
+                grid-template-columns: 1fr;
+            }
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="grid-overlay"></div>
+    
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="logo-section">
+            <div class="logo-icon">🇮🇳</div>
+            <div class="logo-text">
+                <h1>GST ITC PLATFORM</h1>
+                <p>Government Validation</p>
+            </div>
+        </div>
+        
+        <div class="nav-center">
+            <a href="/" class="nav-link active">Dashboard</a>
+            <a href="/workflow" class="nav-link">Workflow</a>
+            <a href="/upload" class="nav-link">Upload</a>
+            <a href="/results" class="nav-link">Results</a>
+            <a href="/docs" class="nav-link">API</a>
+        </div>
+        
+        <div class="nav-actions">
+            <button class="btn btn-outline" onclick="window.location.href='/upload'">📤 Upload</button>
+            <button class="btn btn-primary" onclick="window.location.href='/workflow'">🚀 Start</button>
+        </div>
+    </nav>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Stats -->
+        <div class="hero-stats">
+            <div class="stat-card fade-in" style="animation-delay: 0.1s;">
+                <div class="stat-trend">📊</div>
+                <div class="stat-label">Total Invoices</div>
+                <div class="stat-value" id="totalInvoices">0</div>
+                <div class="stat-subtitle">Processed</div>
+            </div>
+            
+            <div class="stat-card fade-in" style="animation-delay: 0.2s;">
+                <div class="stat-trend">💰</div>
+                <div class="stat-label">ITC Claimed</div>
+                <div class="stat-value">₹<span id="itcClaimed">0</span></div>
+                <div class="stat-subtitle">Total Amount</div>
+            </div>
+            
+            <div class="stat-card fade-in" style="animation-delay: 0.3s;">
+                <div class="stat-trend">✅</div>
+                <div class="stat-label">ITC Approved</div>
+                <div class="stat-value">₹<span id="itcApproved">0</span></div>
+                <div class="stat-subtitle">Validated</div>
+            </div>
+            
+            <div class="stat-card fade-in" style="animation-delay: 0.4s;">
+                <div class="stat-trend">🚨</div>
+                <div class="stat-label">High Risk</div>
+                <div class="stat-value" id="highRisk">0</div>
+                <div class="stat-subtitle">Critical Issues</div>
+            </div>
+        </div>
+        
+        <!-- Risk Gauge & Timeline -->
+        <div class="risk-section fade-in" style="animation-delay: 0.5s;">
+            <div class="risk-gauge-card">
+                <div class="gauge-title">System Risk Score</div>
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 250 150">
+                        <path d="M 25 125 A 100 100 0 0 1 225 125" 
+                              fill="none" 
+                              stroke="rgba(0, 212, 255, 0.1)" 
+                              stroke-width="15" 
+                              stroke-linecap="round"/>
+                        <path d="M 25 125 A 100 100 0 0 1 91 41" 
+                              fill="none" 
+                              stroke="#00ff88" 
+                              stroke-width="15" 
+                              stroke-linecap="round"/>
+                        <path d="M 91 41 A 100 100 0 0 1 159 41" 
+                              fill="none" 
+                              stroke="#ffb800" 
+                              stroke-width="15" 
+                              stroke-linecap="round"/>
+                        <path d="M 159 41 A 100 100 0 0 1 225 125" 
+                              fill="none" 
+                              stroke="#ff3366" 
+                              stroke-width="15" 
+                              stroke-linecap="round"/>
+                    </svg>
+                    <div class="gauge-needle" id="riskNeedle"></div>
+                    <div class="gauge-value">
+                        <div class="gauge-score" id="riskScore">0</div>
+                        <div class="gauge-label">Risk Level</div>
+                    </div>
+                </div>
+                <div class="risk-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #00ff88;"></div>
+                        <span>Low (0-33)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #ffb800;"></div>
+                        <span>Medium (34-66)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #ff3366;"></div>
+                        <span>High (67-100)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-card">
+                <div class="timeline-header">
+                    <h3>ITC Validation Process</h3>
+                    <p>Complete end-to-end workflow</p>
+                </div>
+                <div class="timeline-steps">
+                    <div class="timeline-step">
+                        <div class="step-circle">1</div>
+                        <div class="step-title">GSTR-1</div>
+                        <div class="step-desc">Seller Files</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-circle">2</div>
+                        <div class="step-title">GSTR-2B</div>
+                        <div class="step-desc">Auto-Generated</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-circle">3</div>
+                        <div class="step-title">GSTR-3B</div>
+                        <div class="step-desc">Buyer Claims</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-circle">4</div>
+                        <div class="step-title">Validate</div>
+                        <div class="step-desc">AI Checks</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-circle">5</div>
+                        <div class="step-title">Report</div>
+                        <div class="step-desc">Final Approval</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Grid -->
+        <div class="activity-grid">
+            <div class="activity-card fade-in" style="animation-delay: 0.6s;">
+                <div class="activity-header">
+                    <h3>Recent Activity</h3>
+                    <a href="/results" class="view-all">View All →</a>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: rgba(0, 255, 136, 0.1); color: #00ff88;">✓</div>
+                    <div class="activity-content">
+                        <div class="activity-title">50 Invoices Processed</div>
+                        <div class="activity-desc">Batch validation completed</div>
+                    </div>
+                    <div class="activity-time">Just now</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: rgba(255, 184, 0, 0.1); color: #ffb800;">⚠</div>
+                    <div class="activity-content">
+                        <div class="activity-title">5 Mismatches Found</div>
+                        <div class="activity-desc">Requires review</div>
+                    </div>
+                    <div class="activity-time">2 min ago</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: rgba(0, 212, 255, 0.1); color: #00d4ff;">📄</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Report Generated</div>
+                        <div class="activity-desc">PDF ready for download</div>
+                    </div>
+                    <div class="activity-time">5 min ago</div>
+                </div>
+            </div>
+            
+            <div class="activity-card fade-in" style="animation-delay: 0.7s;">
+                <div class="activity-header">
+                    <h3>Quick Actions</h3>
+                </div>
+                <div class="activity-item" style="cursor: pointer;" onclick="window.location.href='/workflow'">
+                    <div class="activity-icon" style="background: rgba(0, 212, 255, 0.1); color: #00d4ff;">🚀</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Start New Workflow</div>
+                        <div class="activity-desc">Process invoices end-to-end</div>
+                    </div>
+                </div>
+                <div class="activity-item" style="cursor: pointer;" onclick="window.location.href='/upload'">
+                    <div class="activity-icon" style="background: rgba(178, 75, 243, 0.1); color: #b24bf3;">📤</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Upload Data</div>
+                        <div class="activity-desc">Import CSV or JSON files</div>
+                    </div>
+                </div>
+                <div class="activity-item" style="cursor: pointer;" onclick="window.location.href='/results'">
+                    <div class="activity-icon" style="background: rgba(255, 0, 110, 0.1); color: #ff006e;">📊</div>
+                    <div class="activity-content">
+                        <div class="activity-title">View Results</div>
+                        <div class="activity-desc">Detailed analysis & reports</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Counter Animation
+        function animateCounter(id, target, prefix = '', suffix = '') {
+            const element = document.getElementById(id);
+            const duration = 2000;
+            const steps = 60;
+            const increment = target / steps;
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = prefix + Math.floor(current).toLocaleString('en-IN') + suffix;
+            }, duration / steps);
+        }
+        
+        // Risk Gauge Animation
+        function setRiskScore(score) {
+            const needle = document.getElementById('riskNeedle');
+            const scoreDisplay = document.getElementById('riskScore');
+            
+            const rotation = -90 + (score * 1.8);
+            needle.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            
+            let current = 0;
+            const timer = setInterval(() => {
+                current += 1;
+                if (current >= score) {
+                    current = score;
+                    clearInterval(timer);
+                }
+                scoreDisplay.textContent = current;
+            }, 20);
+        }
+        
+        // Load Stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                const total = data.total_invoices || 50;
+                const mismatches = data.total_mismatches || 5;
+                const highRisk = data.high_risk_count || 5;
+                
+                animateCounter('totalInvoices', total);
+                animateCounter('itcClaimed', total * 1800);
+                animateCounter('itcApproved', (total - mismatches) * 1800);
+                animateCounter('highRisk', highRisk);
+                
+                const riskScore = Math.min(100, Math.round((mismatches / total) * 100 * 2));
+                setTimeout(() => setRiskScore(riskScore), 500);
+                
+            } catch (error) {
+                animateCounter('totalInvoices', 50);
+                animateCounter('itcClaimed', 90000);
+                animateCounter('itcApproved', 81000);
+                animateCounter('highRisk', 5);
+                setTimeout(() => setRiskScore(20), 500);
+            }
+        }
+        
+        window.addEventListener('load', loadStats);
+    </script>
+</body>
+</html>

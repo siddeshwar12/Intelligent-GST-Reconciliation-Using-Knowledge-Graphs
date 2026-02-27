@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Data - GST Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-main: #050505;
+            --bg-card: #0d0d0d;
+            --bg-elevated: #1a1a1a;
+            --accent-green: #00ff9f;
+            --accent-blue: #00b8ff;
+            --accent-orange: #ff6b00;
+            --accent-red: #ff0055;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border: #222222;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(at 0% 0%, rgba(0, 255, 159, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 184, 255, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 107, 0, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(255, 0, 85, 0.05) 0px, transparent 50%);
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .brand-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 40px rgba(0, 255, 159, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 0.25rem;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn {
+            padding: 0.875rem 1.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-green);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            box-shadow: 0 8px 24px rgba(0, 255, 159, 0.2);
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-title h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .page-title p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+        
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .upload-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+        }
+        
+        .panel-header {
+            margin-bottom: 2rem;
+        }
+        
+        .panel-header h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .panel-header p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: var(--bg-elevated);
+        }
+        
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 159, 0.05);
+        }
+        
+        .drop-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .drop-text h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .drop-text p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(0, 255, 159, 0.2);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 12px 32px rgba(0, 255, 159, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--accent-green);
+        }
+        
+        .file-list {
+            margin-top: 2rem;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .file-details h5 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .file-details p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .file-remove {
+            background: none;
+            border: none;
+            color: var(--accent-red);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .file-remove:hover {
+            transform: scale(1.2);
+        }
+        
+        .sample-data {
+            margin-top: 2rem;
+        }
+        
+        .sample-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .sample-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sample-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-2px);
+        }
+        
+        .sample-card h5 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sample-card p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .progress-section {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .progress-section.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-elevated);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .success-message {
+            display: none;
+            background: rgba(0, 255, 159, 0.1);
+            border: 1px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .success-message.active {
+            display: block;
+        }
+        
+        .success-message h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            animation: slideUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">🇮🇳</div>
+                <div class="brand-text">
+                    <h1>GST Intelligence</h1>
+                    <p>Reconciliation Engine</p>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="/" class="nav-btn">Dashboard</a>
+                <a href="/workflow" class="nav-btn">Workflow</a>
+                <a href="/upload" class="nav-btn active">Upload</a>
+                <a href="/results" class="nav-btn">Results</a>
+            </nav>
+        </header>
+        
+        <div class="page-title animate">
+            <h2>Upload Invoice Data</h2>
+            <p>Import CSV or JSON files for intelligent reconciliation</p>
+        </div>
+        
+        <div class="upload-grid">
+            <div class="upload-panel animate" style="animation-delay: 0.1s;">
+                <div class="panel-header">
+                    <h3>File Upload</h3>
+                    <p>Drag and drop or click to browse</p>
+                </div>
+                
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-icon">📁</div>
+                    <div class="drop-text">
+                        <h4>Drop files here</h4>
+                        <p>Supports CSV and JSON formats</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                            Browse Files
+                        </button>
+                    </div>
+                </div>
+                
+                <input type="file" id="fileInput" class="file-input" accept=".csv,.json" multiple>
+                
+                <div class="file-list" id="fileList"></div>
+                
+                <div class="progress-section" id="progressSection">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Uploading...</div>
+                </div>
+                
+                <div class="success-message" id="successMessage">
+                    <h4>✓ Upload Successful</h4>
+                    <p>Files processed successfully. View results below.</p>
+                </div>
+            </div>
+            
+            <div class="upload-panel animate" style="animation-delay: 0.2s;">
+                <div class="panel-header">
+                    <h3>Quick Start</h3>
+                    <p>Generate sample data for testing</p>
+                </div>
+                
+                <div class="sample-data">
+                    <div class="sample-grid">
+                        <div class="sample-card" onclick="generateSampleData(50)">
+                            <h5>📊 Small Dataset</h5>
+                            <p>50 invoices for quick testing</p>
+                        </div>
+                        
+                        <div class="sample-card" onclick="generateSampleData(200)">
+                            <h5>📈 Medium Dataset</h5>
+                            <p>200 invoices with mismatches</p>
+                        </div>
+                        
+                        <div class="sample-card" onclick="generateSampleData(500)">
+                            <h5>📉 Large Dataset</h5>
+                            <p>500 invoices for stress testing</p>
+                        </div>
+                        
+                        <div class="sample-card" onclick="generateSampleData(1000)">
+                            <h5>🚀 Enterprise Dataset</h5>
+                            <p>1000+ invoices with fraud patterns</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem;">File Format Requirements</h4>
+                    <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                            <strong style="color: var(--text-primary);">CSV Format:</strong> invoice_number, vendor_gstin, buyer_gstin, amount, tax_amount, date
+                        </p>
+                        <p style="font-size: 0.875rem; color: var(--text-secondary);">
+                            <strong style="color: var(--text-primary);">JSON Format:</strong> Array of invoice objects with required fields
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const progressSection = document.getElementById('progressSection');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const successMessage = document.getElementById('successMessage');
+        
+        let selectedFiles = [];
+        
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            displayFiles();
+        }
+        
+        function displayFiles() {
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">📄</div>
+                        <div class="file-details">
+                            <h5>${file.name}</h5>
+                            <p>${(file.size / 1024).toFixed(2)} KB</p>
+                        </div>
+                    </div>
+                    <button class="file-remove" onclick="removeFile(${index})">×</button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+            
+            if (selectedFiles.length > 0) {
+                uploadFiles();
+            }
+        }
+        
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displayFiles();
+        }
+        
+        async function uploadFiles() {
+            if (selectedFiles.length === 0) return;
+            
+            progressSection.classList.add('active');
+            successMessage.classList.remove('active');
+            
+            const formData = new FormData();
+            selectedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+            
+            try {
+                // Simulate progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    progressFill.style.width = progress + '%';
+                    progressText.textContent = `Uploading... ${progress}%`;
+                    
+                    if (progress >= 90) {
+                        clearInterval(interval);
+                    }
+                }, 200);
+                
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                clearInterval(interval);
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Processing complete!';
+                
+                setTimeout(() => {
+                    progressSection.classList.remove('active');
+                    successMessage.classList.add('active');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/results';
+                    }, 2000);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                progressText.textContent = 'Upload failed. Please try again.';
+                progressText.style.color = 'var(--accent-red)';
+            }
+        }
+        
+        async function generateSampleData(count) {
+            progressSection.classList.add('active');
+            successMessage.classList.remove('active');
+            progressText.textContent = `Generating ${count} sample invoices...`;
+            
+            try {
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 15;
+                    progressFill.style.width = progress + '%';
+                    if (progress >= 90) clearInterval(interval);
+                }, 150);
+                
+                const response = await fetch(`/api/generate-sample?count=${count}`, {
+                    method: 'POST'
+                });
+                
+                clearInterval(interval);
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Sample data generated!';
+                
+                setTimeout(() => {
+                    progressSection.classList.remove('active');
+                    successMessage.classList.add('active');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/workflow';
+                    }, 2000);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Generation error:', error);
+                progressText.textContent = 'Generation failed. Please try again.';
+                progressText.style.color = 'var(--accent-red)';
+            }
+        }
+    </script>
+</body>
+</html>

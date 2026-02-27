@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - GST Reconciliation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav a {
+            color: #2563eb;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .nav a:hover { background: #f3f4f6; }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .stat-label {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .primary { color: #2563eb; }
+        .success { color: #10b981; }
+        .warning { color: #f59e0b; }
+        .danger { color: #ef4444; }
+        
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .card h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        tr:hover { background: #f9fafb; }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-high { background: #fee2e2; color: #991b1b; }
+        .badge-medium { background: #fef3c7; color: #92400e; }
+        .badge-low { background: #d1fae5; color: #065f46; }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+        
+        .empty-state-icon { font-size: 4rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📊 Reconciliation Results</h1>
+        <p>View processed data and detected mismatches</p>
+    </header>
+
+    <div class="nav">
+        <a href="/">🏠 Dashboard</a>
+        <a href="/workflow">🔄 Workflow</a>
+        <a href="/upload">📤 Upload Data</a>
+        <a href="/results">📊 View Results</a>
+        <a href="/docs">📚 API Docs</a>
+    </div>
+
+    <div class="container">
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Loading results...</p>
+        </div>
+
+        <div id="resultsContent" style="display: none;">
+            <div class="stats-grid" id="statsGrid"></div>
+            
+            <div class="card">
+                <h2>🔍 Detected Mismatches</h2>
+                <div id="mismatchesTable"></div>
+            </div>
+            
+            <div class="card">
+                <h2>📋 Recent Invoices</h2>
+                <div id="invoicesTable"></div>
+            </div>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">📭</div>
+            <h2>No Data Yet</h2>
+            <p>Upload and process data to see results here</p>
+            <a href="/upload" class="nav" style="display: inline-block; margin-top: 1rem;">Go to Upload</a>
+        </div>
+    </div>
+
+    <script>
+        async function loadResults() {
+            try {
+                // Load statistics
+                const statsResponse = await fetch('/api/stats');
+                const stats = await statsResponse.json();
+                
+                // Load mismatches
+                const mismatchesResponse = await fetch('/api/mismatches?limit=20');
+                const mismatches = await mismatchesResponse.json();
+                
+                // Load invoices
+                const invoicesResponse = await fetch('/api/invoices?limit=10');
+                const invoices = await invoicesResponse.json();
+                
+                // Hide loading, show results
+                document.getElementById('loadingState').style.display = 'none';
+                
+                if (stats.total_invoices === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                    return;
+                }
+                
+                document.getElementById('resultsContent').style.display = 'block';
+                
+                // Render statistics
+                renderStats(stats);
+                
+                // Render mismatches
+                renderMismatches(mismatches);
+                
+                // Render invoices
+                renderInvoices(invoices);
+                
+            } catch (error) {
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="empty-state-icon">❌</div>
+                    <h2>Error Loading Results</h2>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        function renderStats(stats) {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <h3 class="primary">Total Invoices</h3>
+                    <div class="stat-value primary">${stats.total_invoices || 0}</div>
+                    <div class="stat-label">Processed</div>
+                </div>
+                <div class="stat-card">
+                    <h3 class="warning">Mismatches</h3>
+                    <div class="stat-value warning">${stats.total_mismatches || 0}</div>
+                    <div class="stat-label">Detected</div>
+                </div>
+                <div class="stat-card">
+                    <h3 class="success">Match Rate</h3>
+                    <div class="stat-value success">${stats.match_rate || '0'}%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+                <div class="stat-card">
+                    <h3 class="danger">High Risk</h3>
+                    <div class="stat-value danger">${stats.high_risk_count || 0}</div>
+                    <div class="stat-label">Items</div>
+                </div>
+            `;
+        }
+
+        function renderMismatches(mismatches) {
+            const container = document.getElementById('mismatchesTable');
+            
+            if (!mismatches || mismatches.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 2rem;">No mismatches found</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Invoice Number</th>
+                            <th>Type</th>
+                            <th>Severity</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${mismatches.map(m => `
+                            <tr>
+                                <td>${m.invoice_number || 'N/A'}</td>
+                                <td>${m.mismatch_type || 'Unknown'}</td>
+                                <td><span class="badge badge-${m.severity || 'low'}">${(m.severity || 'low').toUpperCase()}</span></td>
+                                <td>${m.description || 'No description'}</td>
+                                <td>₹${(m.amount || 0).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function renderInvoices(invoices) {
+            const container = document.getElementById('invoicesTable');
+            
+            if (!invoices || invoices.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 2rem;">No invoices found</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Invoice Number</th>
+                            <th>Date</th>
+                            <th>Supplier GSTIN</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${invoices.map(inv => `
+                            <tr>
+                                <td>${inv.invoice_number || 'N/A'}</td>
+                                <td>${inv.invoice_date || 'N/A'}</td>
+                                <td>${inv.supplier_gstin || 'N/A'}</td>
+                                <td>₹${(inv.total_amount || 0).toLocaleString()}</td>
+                                <td><span class="badge badge-${inv.status === 'matched' ? 'low' : 'high'}">${inv.status || 'Unknown'}</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Load results on page load
+        loadResults();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadResults, 30000);
+    </script>
+</body>
+</html>

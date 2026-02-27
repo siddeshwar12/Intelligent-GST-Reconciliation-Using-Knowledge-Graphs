@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow - GST Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-main: #050505;
+            --bg-card: #0d0d0d;
+            --bg-elevated: #1a1a1a;
+            --accent-green: #00ff9f;
+            --accent-blue: #00b8ff;
+            --accent-orange: #ff6b00;
+            --accent-red: #ff0055;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border: #222222;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(at 0% 0%, rgba(0, 255, 159, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 184, 255, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(255, 107, 0, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(255, 0, 85, 0.05) 0px, transparent 50%);
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .brand-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 0 40px rgba(0, 255, 159, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 0.25rem;
+        }
+        
+        .header-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn {
+            padding: 0.875rem 1.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: var(--bg-card);
+            border-color: var(--accent-green);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border: none;
+            box-shadow: 0 8px 24px rgba(0, 255, 159, 0.2);
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .page-title h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .page-title p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+        
+        .workflow-steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        
+        .workflow-steps::before {
+            content: '';
+            position: absolute;
+            top: 60px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            z-index: 0;
+        }
+        
+        .step-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s;
+            cursor: pointer;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-green);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .step-card.active {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 40px rgba(0, 255, 159, 0.2);
+        }
+        
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            font-weight: 900;
+            box-shadow: 0 0 30px rgba(0, 255, 159, 0.3);
+        }
+        
+        .step-card.pending .step-number {
+            background: var(--bg-elevated);
+            box-shadow: none;
+        }
+        
+        .step-title {
+            font-size: 1.125rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .step-status {
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        .step-status.complete {
+            background: rgba(0, 255, 159, 0.1);
+            color: var(--accent-green);
+        }
+        
+        .step-status.active {
+            background: rgba(0, 184, 255, 0.1);
+            color: var(--accent-blue);
+        }
+        
+        .step-status.pending {
+            background: rgba(136, 136, 136, 0.1);
+            color: var(--text-secondary);
+        }
+        
+        .details-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            color: white;
+            box-shadow: 0 8px 24px rgba(0, 255, 159, 0.2);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 12px 32px rgba(0, 255, 159, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .detail-content {
+            display: none;
+        }
+        
+        .detail-content.active {
+            display: block;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .info-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .explanation {
+            background: var(--bg-elevated);
+            border-left: 3px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .explanation h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        .explanation p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        
+        @media (max-width: 1400px) {
+            .workflow-steps {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .workflow-steps {
+                grid-template-columns: 1fr;
+            }
+            .workflow-steps::before {
+                display: none;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            animation: slideUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">🇮🇳</div>
+                <div class="brand-text">
+                    <h1>GST Intelligence</h1>
+                    <p>Reconciliation Engine</p>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a href="/" class="nav-btn">Dashboard</a>
+                <a href="/workflow" class="nav-btn active">Workflow</a>
+                <a href="/upload" class="nav-btn">Upload</a>
+                <a href="/results" class="nav-btn">Results</a>
+            </nav>
+        </header>
+        
+        <div class="page-title animate">
+            <h2>ITC Validation Workflow</h2>
+            <p>Complete end-to-end GST reconciliation process</p>
+        </div>
+        
+        <div class="workflow-steps animate" style="animation-delay: 0.1s;">
+            <div class="step-card active" onclick="showDetails(1)">
+                <div class="step-number">1</div>
+                <div class="step-title">GSTR-1 Filing</div>
+                <div class="step-desc">Seller uploads invoice data to government portal</div>
+                <div class="step-status complete">✓ Complete</div>
+            </div>
+            
+            <div class="step-card active" onclick="showDetails(2)">
+                <div class="step-number">2</div>
+                <div class="step-title">GSTR-2B Generation</div>
+                <div class="step-desc">Government auto-generates buyer's ITC statement</div>
+                <div class="step-status complete">✓ Complete</div>
+            </div>
+            
+            <div class="step-card active" onclick="showDetails(3)">
+                <div class="step-number">3</div>
+                <div class="step-title">GSTR-3B Claim</div>
+                <div class="step-desc">Buyer claims Input Tax Credit</div>
+                <div class="step-status active">⚡ Processing</div>
+            </div>
+            
+            <div class="step-card pending" onclick="showDetails(4)">
+                <div class="step-number">4</div>
+                <div class="step-title">AI Validation</div>
+                <div class="step-desc">Multi-hop chain verification with ML</div>
+                <div class="step-status pending">⏳ Pending</div>
+            </div>
+            
+            <div class="step-card pending" onclick="showDetails(5)">
+                <div class="step-number">5</div>
+                <div class="step-title">Final Report</div>
+                <div class="step-desc">Generate approval report with audit trail</div>
+                <div class="step-status pending">⏳ Pending</div>
+            </div>
+        </div>
+        
+        <div class="details-panel animate" style="animation-delay: 0.2s;">
+            <div class="panel-header">
+                <h3 class="panel-title" id="detailTitle">Step 1: GSTR-1 Filing</h3>
+                <button class="btn btn-primary" onclick="processStep()">Process Next Step →</button>
+            </div>
+            
+            <div class="detail-content active" id="detail1">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Invoices Filed</div>
+                        <div class="info-value">50</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Total Amount</div>
+                        <div class="info-value">₹90,000</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Tax Amount</div>
+                        <div class="info-value">₹16,200</div>
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h4>📋 What is GSTR-1?</h4>
+                    <p>GSTR-1 is a monthly return filed by registered sellers. It contains details of all outward supplies (sales) made during the month. When a seller files GSTR-1, this data becomes the foundation for the buyer's Input Tax Credit (ITC) claim.</p>
+                </div>
+            </div>
+            
+            <div class="detail-content" id="detail2">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Auto-Generated</div>
+                        <div class="info-value">50</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">ITC Eligible</div>
+                        <div class="info-value">₹16,200</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Matched</div>
+                        <div class="info-value">100%</div>
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h4>🔄 What is GSTR-2B?</h4>
+                    <p>GSTR-2B is an auto-generated statement by the government. It shows all purchases made by a buyer based on the GSTR-1 filed by their suppliers. This is the buyer's eligible ITC that they can claim. The buyer CANNOT modify this document - it's purely informational.</p>
+                </div>
+            </div>
+            
+            <div class="detail-content" id="detail3">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">ITC Claimed</div>
+                        <div class="info-value">₹16,200</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Eligible Amount</div>
+                        <div class="info-value">₹16,200</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Difference</div>
+                        <div class="info-value" style="color: var(--accent-green);">₹0</div>
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h4>💰 What is GSTR-3B?</h4>
+                    <p>GSTR-3B is the monthly return where the buyer claims their Input Tax Credit. The buyer enters the ITC amount they want to claim. Our system compares this claimed amount with the eligible amount from GSTR-2B. Any mismatch is flagged for investigation.</p>
+                </div>
+            </div>
+            
+            <div class="detail-content" id="detail4">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Validations Run</div>
+                        <div class="info-value">7</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Mismatches Found</div>
+                        <div class="info-value">5</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Risk Score</div>
+                        <div class="info-value" style="color: var(--accent-orange);">35</div>
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h4>🤖 AI Validation Process</h4>
+                    <p>Our system performs multi-hop validation: (1) Invoice chain verification, (2) Amount matching across GSTR-1/2B/3B, (3) Vendor risk assessment using ML, (4) Fraud pattern detection, (5) Payment verification, (6) Timeline analysis, (7) Compliance checks. Each invoice gets a risk score and detailed explanation.</p>
+                </div>
+            </div>
+            
+            <div class="detail-content" id="detail5">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Approved</div>
+                        <div class="info-value">45</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Rejected</div>
+                        <div class="info-value">5</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Approval Rate</div>
+                        <div class="info-value">90%</div>
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h4>📄 Final Report Generation</h4>
+                    <p>The system generates a comprehensive PDF report with natural language explanations. Each mismatch includes: company names, what happened, why it's risky, what needs to be done, and recommendations. The report includes audit trail, risk assessment, and actionable insights for tax officers.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 1;
+        
+        function showDetails(step) {
+            currentStep = step;
+            
+            // Hide all details
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('detail' + i).classList.remove('active');
+            }
+            
+            // Show selected detail
+            document.getElementById('detail' + step).classList.add('active');
+            
+            // Update title
+            const titles = [
+                'Step 1: GSTR-1 Filing',
+                'Step 2: GSTR-2B Generation',
+                'Step 3: GSTR-3B Claim',
+                'Step 4: AI Validation',
+                'Step 5: Final Report'
+            ];
+            document.getElementById('detailTitle').textContent = titles[step - 1];
+        }
+        
+        function processStep() {
+            if (currentStep < 5) {
+                currentStep++;
+                showDetails(currentStep);
+                
+                // Update step card status
+                const cards = document.querySelectorAll('.step-card');
+                cards[currentStep - 1].classList.remove('pending');
+                cards[currentStep - 1].classList.add('active');
+                
+                const status = cards[currentStep - 1].querySelector('.step-status');
+                if (currentStep < 5) {
+                    status.className = 'step-status active';
+                    status.textContent = '⚡ Processing';
+                } else {
+                    status.className = 'step-status complete';
+                    status.textContent = '✓ Complete';
+                }
+                
+                // Mark previous as complete
+                if (currentStep > 1) {
+                    const prevStatus = cards[currentStep - 2].querySelector('.step-status');
+                    prevStatus.className = 'step-status complete';
+                    prevStatus.textContent = '✓ Complete';
+                }
+            } else {
+                window.location.href = '/results';
+            }
+        }
+    </script>
+</body>
+</html>

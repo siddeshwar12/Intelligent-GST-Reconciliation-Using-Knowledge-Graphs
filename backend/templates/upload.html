@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Data - GST Reconciliation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav a {
+            color: #2563eb;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .nav a:hover { background: #f3f4f6; }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .upload-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .upload-card h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+        
+        .upload-zone {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 3rem;
+            text-align: center;
+            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-zone:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        
+        .upload-zone.dragover {
+            border-color: #2563eb;
+            background: #dbeafe;
+        }
+        
+        .upload-icon { font-size: 3rem; margin-bottom: 1rem; }
+        
+        input[type="file"] { display: none; }
+        
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover { background: #1d4ed8; }
+        .btn:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        .btn-secondary {
+            background: #10b981;
+            margin-left: 1rem;
+        }
+        
+        .btn-secondary:hover { background: #059669; }
+        
+        .file-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 0.5rem;
+            display: none;
+        }
+        
+        .file-info.show { display: block; }
+        
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .progress.show { display: block; }
+        
+        .progress-bar {
+            height: 100%;
+            background: #2563eb;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: none;
+        }
+        
+        .result.show { display: block; }
+        .result.success { background: #d1fae5; color: #065f46; }
+        .result.error { background: #fee2e2; color: #991b1b; }
+        
+        .sample-data {
+            background: #fffbeb;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #fde68a;
+            margin-bottom: 2rem;
+        }
+        
+        .sample-data h3 { color: #92400e; margin-bottom: 0.5rem; }
+        
+        .instructions {
+            background: #eff6ff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #bfdbfe;
+            margin-bottom: 2rem;
+        }
+        
+        .instructions h3 { color: #1e40af; margin-bottom: 0.5rem; }
+        .instructions ol { margin-left: 1.5rem; margin-top: 0.5rem; }
+        .instructions li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📤 Upload GST Data</h1>
+        <p>Upload invoice data for reconciliation and analysis</p>
+    </header>
+
+    <div class="nav">
+        <a href="/">🏠 Dashboard</a>
+        <a href="/workflow">🔄 Workflow</a>
+        <a href="/upload">📤 Upload Data</a>
+        <a href="/results">📊 View Results</a>
+        <a href="/docs">📚 API Docs</a>
+    </div>
+
+    <div class="container">
+        <div class="sample-data">
+            <h3>💡 Quick Demo</h3>
+            <p>Want to test quickly? Click the button below to generate and process sample data automatically!</p>
+            <button class="btn btn-secondary" onclick="generateSampleData()">🎲 Generate & Process Sample Data</button>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Instructions</h3>
+            <ol>
+                <li>Prepare your invoice data in CSV or JSON format</li>
+                <li>Click the upload zone or drag & drop your file</li>
+                <li>Click "Process Data" to run reconciliation</li>
+                <li>View results in the Results page</li>
+            </ol>
+            <p><strong>Supported formats:</strong> CSV, JSON (max 50MB)</p>
+        </div>
+
+        <div class="upload-card">
+            <h2>Upload Invoice Data</h2>
+            
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <p><strong>Click to upload</strong> or drag and drop</p>
+                <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem;">CSV or JSON files (max 50MB)</p>
+            </div>
+            
+            <input type="file" id="fileInput" accept=".csv,.json" onchange="handleFileSelect(event)">
+            
+            <div class="file-info" id="fileInfo">
+                <p><strong>Selected file:</strong> <span id="fileName"></span></p>
+                <p><strong>Size:</strong> <span id="fileSize"></span></p>
+                <p><strong>Type:</strong> <span id="fileType"></span></p>
+            </div>
+            
+            <div class="progress" id="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="result" id="result"></div>
+            
+            <div style="margin-top: 1.5rem;">
+                <button class="btn" id="uploadBtn" onclick="uploadFile()" disabled>📤 Upload File</button>
+                <button class="btn btn-secondary" id="processBtn" onclick="processData()" disabled>⚙️ Process Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let uploadedFileName = null;
+
+        // Drag and drop handlers
+        const uploadZone = document.getElementById('uploadZone');
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            selectedFile = file;
+            
+            // Show file info
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            document.getElementById('fileType').textContent = file.type || 'Unknown';
+            document.getElementById('fileInfo').classList.add('show');
+            
+            // Enable upload button
+            document.getElementById('uploadBtn').disabled = false;
+            
+            // Hide previous results
+            document.getElementById('result').classList.remove('show');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        async function uploadFile() {
+            if (!selectedFile) return;
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            // Show progress
+            document.getElementById('progress').classList.add('show');
+            document.getElementById('uploadBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // Update progress
+                document.getElementById('progressBar').style.width = '100%';
+                
+                if (response.ok) {
+                    showResult('success', `✅ File uploaded successfully! ${data.records_count} records found.`);
+                    uploadedFileName = data.filename;
+                    document.getElementById('processBtn').disabled = false;
+                } else {
+                    showResult('error', `❌ Upload failed: ${data.detail}`);
+                }
+            } catch (error) {
+                showResult('error', `❌ Upload error: ${error.message}`);
+            } finally {
+                setTimeout(() => {
+                    document.getElementById('progress').classList.remove('show');
+                    document.getElementById('progressBar').style.width = '0%';
+                }, 1000);
+            }
+        }
+
+        async function processData() {
+            if (!uploadedFileName) {
+                showResult('error', '❌ Please upload a file first');
+                return;
+            }
+            
+            document.getElementById('processBtn').disabled = true;
+            showResult('success', '⏳ Processing data... This may take a moment.');
+            
+            try {
+                const response = await fetch('/api/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename: uploadedFileName })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('success', `✅ Processing complete! Found ${data.mismatches_count} mismatches. <a href="/results" style="color: #065f46; text-decoration: underline;">View Results</a>`);
+                } else {
+                    showResult('error', `❌ Processing failed: ${data.detail}`);
+                    document.getElementById('processBtn').disabled = false;
+                }
+            } catch (error) {
+                showResult('error', `❌ Processing error: ${error.message}`);
+                document.getElementById('processBtn').disabled = false;
+            }
+        }
+
+        async function generateSampleData() {
+            showResult('success', '⏳ Generating sample data... Please wait.');
+            
+            try {
+                const response = await fetch('/api/generate-sample', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('success', `✅ Sample data generated and processed! Found ${data.mismatches_count} mismatches. <a href="/results" style="color: #065f46; text-decoration: underline;">View Results</a>`);
+                } else {
+                    showResult('error', `❌ Generation failed: ${data.detail}`);
+                }
+            } catch (error) {
+                showResult('error', `❌ Error: ${error.message}`);
+            }
+        }
+
+        function showResult(type, message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result show ${type}`;
+            resultDiv.innerHTML = message;
+        }
+    </script>
+</body>
+</html>
