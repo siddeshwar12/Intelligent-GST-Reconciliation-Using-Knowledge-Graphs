@@ -1,11 +1,6 @@
 """
-Example Cypher Queries for GST Reconciliation
-Demonstrates node creation, relationships, and multi-hop ITC traversal
+Example Cypher queries for GST reconciliation entities.
 """
-
-# ============================================================================
-# NODE CREATION QUERIES
-# ============================================================================
 
 CREATE_TAXPAYER = """
 CREATE (t:Taxpayer:Entity {
@@ -44,7 +39,6 @@ CREATE (i:Invoice:Document {
     invoice_number: $invoice_number,
     invoice_date: date($invoice_date),
     financial_year: $financial_year,
-    
     taxable_value: $taxable_value,
     cgst_amount: $cgst_amount,
     sgst_amount: $sgst_amount,
@@ -52,21 +46,17 @@ CREATE (i:Invoice:Document {
     cess_amount: $cess_amount,
     total_tax: $total_tax,
     total_amount: $total_amount,
-    
     irn: $irn,
     place_of_supply: $place_of_supply,
     reverse_charge: $reverse_charge,
     invoice_type: $invoice_type,
     document_type: $document_type,
-    
     source_type: $source_type,
     source_period: $source_period,
     filing_status: $filing_status,
-    
     is_matched: false,
     has_mismatch: false,
     itc_eligible: $itc_eligible,
-    
     created_at: datetime(),
     updated_at: datetime()
 })
@@ -79,6 +69,19 @@ CREATE (l:LineItem:Detail {
     item_number: $item_number,
     description: $description,
     hsn_code: $hsn_code,
-    
     quantity: $quantity,
-  
+    unit: $unit,
+    unit_price: $unit_price,
+    discount_amount: $discount_amount,
+    taxable_value: $taxable_value,
+    cgst_amount: $cgst_amount,
+    sgst_amount: $sgst_amount,
+    igst_amount: $igst_amount,
+    cess_amount: $cess_amount,
+    tax_rate: $tax_rate,
+    total_amount: $total_amount,
+    created_at: datetime(),
+    updated_at: datetime()
+})
+RETURN l
+"""
